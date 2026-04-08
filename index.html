@@ -25,7 +25,7 @@
     .card {
       background: rgba(10, 10, 15, 0.85);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(255 107, 53, 0.3);
+      border: 1px solid rgba(255, 107, 53, 0.3);
       border-radius: 24px;
       padding: 32px;
       max-width: 400px;
@@ -58,7 +58,7 @@
     .opt {
       display: block;
       width: 100%;
-      padding: 18px 20px;
+      padding: 18px 20px 18px 60px; /* espaço para a bola */
       margin: 12px 0;
       background: rgba(255, 255, 255, 0.06);
       border: none;
@@ -121,33 +121,73 @@
       box-shadow: 0 0 25px rgba(255, 107, 53, 0.8);
       transform: scale(1.01);
     }
-    .profile-text {
+
+    /* Telas de resultado */
+    .result-screen {
+      display: none;
       text-align: center;
-      font-size: 1.3rem;
-      margin: 20px 0;
-      font-weight: 600;
-      color: #ff6b35;
-      opacity: 0;
-      transform: translateY(10px);
-      transition: opacity 0.4s, transform 0.4s;
+      padding: 40px 20px;
     }
-    .profile-text.show {
-      opacity: 1;
-      transform: translateY(0);
+    .result-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: #ff6b35;
+      text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+    }
+    .result-desc {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      color: #e5e7eb;
+    }
+    .result-btn {
+      background: #ff6b35;
+      color: black;
+      font-weight: bold;
+      padding: 18px 32px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: 0 0 25px rgba(255, 107, 53, 0.8);
+      transition: all 0.3s;
+    }
+    .result-btn:hover {
+      background: #ff5722;
+      transform: scale(1.03);
     }
   </style>
 </head>
 <body>
   <div class="quiz">
-    <div class="card">
+    <div class="card" id="quizCard">
       <h2 id="question">1. Quando o silêncio surge...</h2>
       
       <button class="opt" data-l="A">Eu tento preencher rapidamente</button>
       <button class="opt" data-l="B">Eu uso a meu favor</button>
       <button class="opt" data-l="C">Eu encaro sem reagir</button>
 
-      <div class="profile-text" id="profile"></div>
       <button class="btn" id="nextBtn">Próximo</button>
+    </div>
+
+    <!-- Telas de resultado -->
+    <div class="result-screen" id="resultA">
+      <h2 class="result-title">Seu perfil: Audição</h2>
+      <p class="result-desc">Você escuta além das palavras. Sua força está na empatia, na leitura de nuances e no poder de criar conexões profundas. O silêncio não é vazio para você — é informação.</p>
+      <button class="result-btn">Explorar seu perfil</button>
+    </div>
+
+    <div class="result-screen" id="resultB">
+      <h2 class="result-title">Seu perfil: Performer</h2>
+      <p class="result-desc">Você age com clareza e propósito. Sua energia move projetos, pessoas e resultados. Não espera perfeição — cria valor agora. Sua presença transforma ideias em realidade.</p>
+      <button class="result-btn">Explorar seu perfil</button>
+    </div>
+
+    <div class="result-screen" id="resultC">
+      <h2 class="result-title">Seu perfil: Confronto</h2>
+      <p class="result-desc">Você enxerga o que outros ignoram. Sua coragem para questionar, desafiar e reconstruir é sua arma mais poderosa. O conflito não te assusta — é onde você descobre verdade.</p>
+      <button class="result-btn">Explorar seu perfil</button>
     </div>
   </div>
 
@@ -164,7 +204,7 @@
     const options = [
       ["Eu tento preencher rapidamente", "Eu uso a meu favor", "Eu encaro sem reagir"],
       ["Defendo minha posição imediatamente", "Escuto e analiso antes de responder", "Evito confronto e mudo de assunto"],
-      ["Visualizo o resultado final", "Começo com o que sei fazer", "Busco ajuda de quem já fez"],
+      ["Visualizo o resultado final", "Começo com o que sei fazer", "Busco ajuda de quem jáz"],
       ["Tento mediar e encontrar consenso", "Apresento minha visão com clareza", "Observo e aguardo o desfecho"],
       ["Agradeço, mas questiono a intenção", "Aceito com gratidão", "Penso: 'O que ele quer?'"],
       ["Minha escuta ativa", "Minha capacidade de executar", "Minha coragem para enfrentar"]
@@ -173,22 +213,22 @@
     const answers = { A: 0, B: 0, C: 0 };
     let currentQ = 0;
     const questionEl = document.getElementById('question');
-    const opts = document.querySelectorAll('.opt');
+    const opts document.querySelectorAll('.opt');
     const nextBtn = document.getElementById('nextBtn');
-    const profileEl = document.getElementById('profile');
-    const card = document.querySelector('.card');
+    const quizCard = document.getElementById('quizCard');
+    const resultA = document.getElementById('resultA');
+    const resultB = document.getElementById('resultB');
+    const resultC = document.getElementById('resultC');
 
     function showQuestion() {
       questionEl.textContent = questions[currentQ];
       opts.forEach((btn, i) => {
         btn.textContent = options[currentQ][i];
-        btn.dataset.l = String.fromCharCode(65 + i); // A, B, C
+        btn.dataset.l = String.fromCharCode(65 + i);
         btn.classList.remove('active');
       });
       nextBtn.classList.remove('active');
       nextBtn.textContent = currentQ === 5 ? 'Ver Resultado' : 'Próximo';
-      profileEl.classList.remove('show');
-      card.classList.remove('animate');
     }
 
     function updateButtonState() {
@@ -210,29 +250,26 @@
       if (!nextBtn.classList.contains('active')) return;
 
       if (currentQ < 5) {
-        card.classList.add('animate');
+        quizCard.classList.add('animate');
         setTimeout(() => {
           currentQ++;
           showQuestion();
-          card.classList.remove('animate');
+          quizCard.classList.remove('animate');
         }, 400);
       } else {
-        // Última pergunta → mostrar perfil
-        let perfil = '';
-        if (answers.A >= answers.B && answers.A >= answers.C) {
-          perfil = 'Audição';
-        } else if (answers.B >= answers.A && answers.B >= answers.C) {
-          perfil = 'Performer';
-        } else {
-          perfil = 'Confronto';
-        }
-        profileEl.textContent = `Seu perfil: ${perfil}`;
-        profileEl.classList.add('show');
-        nextBtn.textContent = 'Ver Resultado';
-        nextBtn.onclick = () => {
-          if (perfil === 'Audição') window.location.href = 'https://sidvix.com.br/resultado-audicao';
-          else if (perfil === 'Performer') window.location.href = 'https://sidvix.com.br/performer';
-          else window.location.href = 'https://sidvix.com.br/confronto';
+        // Mostrar tela de resultado
+        quizCard.style.display = 'none';
+        
+        let screen;
+        if (answers.A >= answers.B && answers.A >= answers.C) screen = resultA;
+        else if (answers.B >= answers.A && answers.B >= answers.C) screen = resultB;
+        else screen = resultC;
+        
+        screen.style.display = 'block';
+        screen.querySelector('.result-btn').onclick = () => {
+          // Aqui você pode redirecionar depois:
+          // window.location.href = 'https://sidvix.com.br/resultado-audicao';
+          alert('Botão "Explorar seu perfil" clicado — pronto para linkar!');
         };
       }
     });
