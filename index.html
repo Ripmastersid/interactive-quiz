@@ -11,6 +11,7 @@
       background: url('5599.gif') center/cover no-repeat;
       font-family: 'Segoe UI', sans-serif;
       overflow-x: hidden;
+      color: white;
     }
     .quiz {
       position: relative;
@@ -24,12 +25,16 @@
     .card {
       background: rgba(10, 10, 15, 0.85);
       backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 107, 53, 0.3);
+      border: 1px solid rgba(255 107, 53, 0.3);
       border-radius: 24px;
       padding: 32px;
       max-width: 400px;
       width: 100%;
       box-shadow: 0 0 30px rgba(255, 107, 53, 0.6);
+      transition: transform 0.4s ease;
+    }
+    .card.animate {
+      transform: translateY(-20px) scale(1.02);
     }
     h2 {
       color: white;
@@ -37,6 +42,18 @@
       margin-bottom: 24px;
       text-align: center;
       font-weight: 600;
+      position: relative;
+    }
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: #ff6b35;
+      border-radius: 2px;
     }
     .opt {
       display: block;
@@ -54,9 +71,10 @@
       position: relative;
       overflow: hidden;
     }
-    .opt:hover {
-      background: rgba(255, 107, 53, 0.15);
-      transform: translateY(-3px);
+    .opt.active {
+      background: #ff6b35;
+      color: black;
+      box-shadow: 0 0 20px rgba(255, 107, 53, 0.8);
     }
     .opt::before {
       content: attr(data-l);
@@ -75,55 +93,151 @@
       font-weight: bold;
       font-size: 1.3rem;
       box-shadow: 0 0 15px rgba(255, 107, 53, 0.7);
+      transition: all 0.3s;
+    }
+    .opt.active::before {
+      background: black;
+      color: white;
+      transform: scale(1.1);
     }
     .btn {
-      background: #ff6b35;
-      color: black;
+      background: rgba(255, 107, 53, 0.3);
+      color: white;
       font-weight: bold;
       padding: 18px;
       border-radius: 16px;
       width: 100%;
       margin-top: 28px;
       border: none;
-      cursor: pointer;
+      cursor: not-allowed;
       transition: all 0.3s;
-      box-shadow: 0 0 25px rgba(255, 107, 53, 0.8);
+      box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
       font-size: 1.2rem;
     }
-    .btn:hover {
-      background: #ff5722;
-      transform: scale(1.02);
+    .btn.active {
+      background: #ff6b35;
+      color: black;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(255, 107, 53, 0.8);
+      transform: scale(1.01);
+    }
+    .profile-text {
+      text-align: center;
+      font-size: 1.3rem;
+      margin: 20px 0;
+      font-weight: 600;
+      color: #ff6b35;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .profile-text.show {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
 <body>
   <div class="quiz">
     <div class="card">
-      <h2>1. Quando o silêncio surge...</h2>
+      <h2 id="question">1. Quando o silêncio surge...</h2>
+      
       <button class="opt" data-l="A">Eu tento preencher rapidamente</button>
       <button class="opt" data-l="B">Eu uso a meu favor</button>
       <button class="opt" data-l="C">Eu encaro sem reagir</button>
-      <button class="btn">Próximo</button>
+
+      <div class="profile-text" id="profile"></div>
+      <button class="btn" id="nextBtn">Próximo</button>
     </div>
   </div>
 
   <script>
-    const opts = document.querySelectorAll('.opt');
-    const btn = document.querySelector('.btn');
-    let ans = { A: 0, B: 0, C: 0 };
+    const questions = [
+      "1. Quando o silêncio surge...",
+      "2. Diante de uma crítica...",
+      "3. Ao planejar algo novo...",
+      "4. Em uma reunião com conflito...",
+      "5. Ao receber um elogio...",
+      "6. Sua maior força é..."
+    ];
 
-    opts.forEach(el => {
-      el.addEventListener('click', () => {
-        const l = el.getAttribute('data-l');
-        ans[l]++;
-        btn.textContent = 'Ver Resultado';
-        btn.onclick = () => {
-          if (ans.A >= ans.B && ans.A >= ans.C) window.location.href = 'https://sidvix.com.br/resultado-audicao';
-          else if (ans.B >= ans.A && ans.B >= ans.C) window.location.href = 'https://sidvix.com.br/performer';
-          else window.location.href = 'https://sidvix.com.br/confronto';
-        };
+    const options = [
+      ["Eu tento preencher rapidamente", "Eu uso a meu favor", "Eu encaro sem reagir"],
+      ["Defendo minha posição imediatamente", "Escuto e analiso antes de responder", "Evito confronto e mudo de assunto"],
+      ["Visualizo o resultado final", "Começo com o que sei fazer", "Busco ajuda de quem já fez"],
+      ["Tento mediar e encontrar consenso", "Apresento minha visão com clareza", "Observo e aguardo o desfecho"],
+      ["Agradeço, mas questiono a intenção", "Aceito com gratidão", "Penso: 'O que ele quer?'"],
+      ["Minha escuta ativa", "Minha capacidade de executar", "Minha coragem para enfrentar"]
+    ];
+
+    const answers = { A: 0, B: 0, C: 0 };
+    let currentQ = 0;
+    const questionEl = document.getElementById('question');
+    const opts = document.querySelectorAll('.opt');
+    const nextBtn = document.getElementById('nextBtn');
+    const profileEl = document.getElementById('profile');
+    const card = document.querySelector('.card');
+
+    function showQuestion() {
+      questionEl.textContent = questions[currentQ];
+      opts.forEach((btn, i) => {
+        btn.textContent = options[currentQ][i];
+        btn.dataset.l = String.fromCharCode(65 + i); // A, B, C
+        btn.classList.remove('active');
+      });
+      nextBtn.classList.remove('active');
+      nextBtn.textContent = currentQ === 5 ? 'Ver Resultado' : 'Próximo';
+      profileEl.classList.remove('show');
+      card.classList.remove('animate');
+    }
+
+    function updateButtonState() {
+      const selected = document.querySelector('.opt.active');
+      nextBtn.classList.toggle('active', !!selected);
+    }
+
+    opts.forEach(btn => {
+      btn.addEventListener('click', () => {
+        opts.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const letter = btn.dataset.l;
+        answers[letter]++;
+        updateButtonState();
       });
     });
+
+    nextBtn.addEventListener('click', () => {
+      if (!nextBtn.classList.contains('active')) return;
+
+      if (currentQ < 5) {
+        card.classList.add('animate');
+        setTimeout(() => {
+          currentQ++;
+          showQuestion();
+          card.classList.remove('animate');
+        }, 400);
+      } else {
+        // Última pergunta → mostrar perfil
+        let perfil = '';
+        if (answers.A >= answers.B && answers.A >= answers.C) {
+          perfil = 'Audição';
+        } else if (answers.B >= answers.A && answers.B >= answers.C) {
+          perfil = 'Performer';
+        } else {
+          perfil = 'Confronto';
+        }
+        profileEl.textContent = `Seu perfil: ${perfil}`;
+        profileEl.classList.add('show');
+        nextBtn.textContent = 'Ver Resultado';
+        nextBtn.onclick = () => {
+          if (perfil === 'Audição') window.location.href = 'https://sidvix.com.br/resultado-audicao';
+          else if (perfil === 'Performer') window.location.href = 'https://sidvix.com.br/performer';
+          else window.location.href = 'https://sidvix.com.br/confronto';
+        };
+      }
+    });
+
+    showQuestion();
   </script>
 </body>
 </html>
