@@ -58,7 +58,7 @@
     .opt {
       display: block;
       width: 100%;
-      padding: 18px 20px 18px 60px; /* espaço para a bola */
+      padding: 18px 20px 18px 60px; /* ✅ ESPAÇO PARA A BOLA LARANJA */
       margin: 12px 0;
       background: rgba(255, 255, 255, 0.06);
       border: none;
@@ -122,11 +122,13 @@
       transform: scale(1.01);
     }
 
-    /* Telas de resultado */
+    /* ✅ TELAS DE RESULTADO (ESCONDIDAS INICIALMENTE) */
     .result-screen {
       display: none;
       text-align: center;
       padding: 40px 20px;
+      max-width: 400px;
+      width: 100%;
     }
     .result-title {
       font-size: 2rem;
@@ -145,8 +147,9 @@
       background: #ff6b35;
       color: black;
       font-weight: bold;
-      padding: 18px 32px;
+      padding: 18px;
       border-radius: 16px;
+      width: 100%;
       border: none;
       cursor: pointer;
       font-size: 1.2rem;
@@ -161,6 +164,7 @@
 </head>
 <body>
   <div class="quiz">
+    <!-- ✅ CONTAINER DAS 6 PERGUNTAS (FUNCIONAL) -->
     <div class="card" id="quizCard">
       <h2 id="question">1. Quando o silêncio surge...</h2>
       
@@ -171,23 +175,23 @@
       <button class="btn" id="nextBtn">Próximo</button>
     </div>
 
-    <!-- Telas de resultado -->
+    <!-- ✅ 3 TELAS DE RESULTADO (SEPARADAS) -->
     <div class="result-screen" id="resultA">
       <h2 class="result-title">Seu perfil: Audição</h2>
-      <p class="result-desc">Você escuta além das palavras. Sua força está na empatia, na leitura de nuances e no poder de criar conexões profundas. O silêncio não é vazio para você — é informação.</p>
-      <button class="result-btn">Explorar seu perfil</button>
+      <p class="result-desc">Você escuta além das palavras. Sua força está na empatia, na leitura de nuances e no poder de criar conexões profundas.</p>
+      <button class="result-btn" onclick="window.location.href='https://sidvix.com.br/resultado-audicao'">Explorar seu perfil</button>
     </div>
 
     <div class="result-screen" id="resultB">
       <h2 class="result-title">Seu perfil: Performer</h2>
-      <p class="result-desc">Você age com clareza e propósito. Sua energia move projetos, pessoas e resultados. Não espera perfeição — cria valor agora. Sua presença transforma ideias em realidade.</p>
-      <button class="result-btn">Explorar seu perfil</button>
+      <p class="result-desc">Você age com clareza e propósito. Sua energia move projetos, pessoas e resultados. Não espera perfeição — cria valor agora.</p>
+      <button class="result-btn" onclick="window.location.href='https://sidvix.com.br/performer'">Explorar seu perfil</button>
     </div>
 
     <div class="result-screen" id="resultC">
       <h2 class="result-title">Seu perfil: Confronto</h2>
-      <p class="result-desc">Você enxerga o que outros ignoram. Sua coragem para questionar, desafiar e reconstruir é sua arma mais poderosa. O conflito não te assusta — é onde você descobre verdade.</p>
-      <button class="result-btn">Explorar seu perfil</button>
+      <p class="result-desc">Você enxerga o que outros ignoram. Sua coragem para questionar, desafiar e reconstruir é sua arma mais poderosa.</p>
+      <button class="result-btn" onclick="window.location.href='https://sidvix.com.br/confronto'">Explorar seu perfil</button>
     </div>
   </div>
 
@@ -204,7 +208,7 @@
     const options = [
       ["Eu tento preencher rapidamente", "Eu uso a meu favor", "Eu encaro sem reagir"],
       ["Defendo minha posição imediatamente", "Escuto e analiso antes de responder", "Evito confronto e mudo de assunto"],
-      ["Visualizo o resultado final", "Começo com o que sei fazer", "Busco ajuda de quem jáz"],
+      ["Visualizo o resultado final", "Começo com o que sei fazer", "Busco ajuda de quem já fez"],
       ["Tento mediar e encontrar consenso", "Apresento minha visão com clareza", "Observo e aguardo o desfecho"],
       ["Agradeço, mas questiono a intenção", "Aceito com gratidão", "Penso: 'O que ele quer?'"],
       ["Minha escuta ativa", "Minha capacidade de executar", "Minha coragem para enfrentar"]
@@ -213,7 +217,7 @@
     const answers = { A: 0, B: 0, C: 0 };
     let currentQ = 0;
     const questionEl = document.getElementById('question');
-    const opts document.querySelectorAll('.opt');
+    const opts = document.querySelectorAll('.opt');
     const nextBtn = document.getElementById('nextBtn');
     const quizCard = document.getElementById('quizCard');
     const resultA = document.getElementById('resultA');
@@ -257,20 +261,16 @@
           quizCard.classList.remove('animate');
         }, 400);
       } else {
-        // Mostrar tela de resultado
+        // ✅ AO CHEGAR NA PERGUNTA 6: ESCONDER QUIZ E MOSTRAR TELA DE RESULTADO
         quizCard.style.display = 'none';
         
-        let screen;
-        if (answers.A >= answers.B && answers.A >= answers.C) screen = resultA;
-        else if (answers.B >= answers.A && answers.B >= answers.C) screen = resultB;
-        else screen = resultC;
-        
-        screen.style.display = 'block';
-        screen.querySelector('.result-btn').onclick = () => {
-          // Aqui você pode redirecionar depois:
-          // window.location.href = 'https://sidvix.com.br/resultado-audicao';
-          alert('Botão "Explorar seu perfil" clicado — pronto para linkar!');
-        };
+        if (answers.A >= answers.B && answers.A >= answers.C) {
+          resultA.style.display = 'block';
+        } else if (answers.B >= answers.A && answers.B >= answers.C) {
+          resultB.style.display = 'block';
+        } else {
+          resultC.style.display = 'block';
+        }
       }
     });
 
