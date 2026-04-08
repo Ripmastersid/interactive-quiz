@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Interativo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: url('5599.gif') center/cover no-repeat;
+      font-family: 'Segoe UI', sans-serif;
+      overflow-x: hidden;
+    }
+    .quiz {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0 20px;
+    }
+    .card {
+      background: rgba(10, 10, 15, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 107, 53, 0.3);
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 0 30px rgba(255, 107, 53, 0.6);
+    }
+    h2 {
+      color: white;
+      font-size: 1.5rem;
+      margin-bottom: 24px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .opt {
+      display: block;
+      width: 100%;
+      padding: 18px 20px;
+      margin: 12px 0;
+      background: rgba(255, 255, 255, 0.06);
+      border: none;
+      border-radius: 16px;
+      color: #e5e7eb;
+      font-size: 1.1rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .opt:hover {
+      background: rgba(255, 107, 53, 0.15);
+      transform: translateY(-3px);
+    }
+    .opt::before {
+      content: attr(data-l);
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #ff6b35;
+      color: black;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.3rem;
+      box-shadow: 0 0 15px rgba(255, 107, 53, 0.7);
+    }
+    .btn {
+      background: #ff6b35;
+      color: black;
+      font-weight: bold;
+      padding: 18px;
+      border-radius: 16px;
+      width: 100%;
+      margin-top: 28px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 0 25px rgba(255, 107, 53, 0.8);
+      font-size: 1.2rem;
+    }
+    .btn:hover {
+      background: #ff5722;
+      transform: scale(1.02);
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz">
+    <div class="card">
+      <h2>1. Quando o silêncio surge...</h2>
+      <button class="opt" data-l="A">Eu tento preencher rapidamente</button>
+      <button class="opt" data-l="B">Eu uso a meu favor</button>
+      <button class="opt" data-l="C">Eu encaro sem reagir</button>
+      <button class="btn">Próximo</button>
+    </div>
+  </div>
+
+  <script>
+    const opts = document.querySelectorAll('.opt');
+    const btn = document.querySelector('.btn');
+    let ans = { A: 0, B: 0, C: 0 };
+
+    opts.forEach(el => {
+      el.addEventListener('click', () => {
+        const l = el.getAttribute('data-l');
+        ans[l]++;
+        btn.textContent = 'Ver Resultado';
+        btn.onclick = () => {
+          if (ans.A >= ans.B && ans.A >= ans.C) window.location.href = 'https://sidvix.com.br/resultado-audicao';
+          else if (ans.B >= ans.A && ans.B >= ans.C) window.location.href = 'https://sidvix.com.br/performer';
+          else window.location.href = 'https://sidvix.com.br/confronto';
+        };
+      });
+    });
+  </script>
+</body>
+</html>
